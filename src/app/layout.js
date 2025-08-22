@@ -2,6 +2,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "../styles/globals.css"
 import Navbar from "@/components/Navbar";
+import { Providers } from "./providers";
 
 
 
@@ -27,7 +28,10 @@ export default async function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Navbar></Navbar>
+        <Providers>
+
           {children}
+        </Providers>
         <footer>Footer</footer>
       </body>
     </html>
