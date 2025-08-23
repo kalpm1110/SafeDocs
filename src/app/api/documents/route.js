@@ -1,6 +1,9 @@
-import { getRedisClient } from "@/lib/redis";
+
+
+import redis from "@/lib/redis";
 import { supabaseServer } from "@/lib/supabase";
 import { createCipheriv, randomBytes } from "crypto";
+
 
 const ENCRYPTION_KEY = Buffer.from(process.env.ENCRYPTION_KEY, 'base64');
 function encrpyt(data) {
@@ -9,7 +12,7 @@ function encrpyt(data) {
     let encrpted = cipher.update(data, 'utf8', 'base64');
     encrpted += cipher.final('base64');
     const authTag = cipher.getAuthTag();
-    return Buffer.concat([iv, Buffer.from(encrpted, 'base64'), authTag]);
+    return Buffer.concat([iv, Buffer.from(encrpted, 'base64'), authTag]).toString('base64');
 }
 
 export async function POST(request) {
@@ -31,27 +34,30 @@ export async function POST(request) {
         if (error) throw new Error(error.message);
 
         const docId = data.id;
-        const redis = await getRedisClient();
+        // const redis = await Redisclient();
         const cache = {
             content: encrpteddata,
-            allowed_emails: docData.allowed_emails,
+            allowed_emails: docData.allowedEmails,
             publicAccess: docData.publicAccess,
             accessType: docData.accessType,
         }
         const cacheKey = `doc:${docId}`;
-        const cacheVal = JSON.stringify(cacheVal);
+        const cacheVal = JSON.stringify(cache);
 
-        const ttlsec = null;
+        let ttlsec = null;
         if (docData.expiry) {
             const expiryData = new Date(docData.expiry);
             ttlsec = Math.max(0, Math.floor((expiryData.getTime() - Date.now()) / 1000));
         } else ttlsec = 86400;
 
-        if (ttlSeconds > 0) {
+        if (ttlsec > 0) {
             await redis.set(cacheKey, cacheVal, { EX: ttlsec });
         } else {
             await redis.set(cacheKey, cacheVal); // No TTL if expired
         }
+
+        // redirect(`/doc/${docId}`);
+
 
         return new Response(JSON.stringify({ id: docId, message: 'Document created and cached' }), {
             status: 200,

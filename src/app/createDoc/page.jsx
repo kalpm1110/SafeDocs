@@ -11,8 +11,12 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft } from "lucide-react"
 import { useKindeAuth } from "@kinde-oss/kinde-auth-nextjs"
+import { useRouter } from "next/navigation"
 
 export default function CreateDocForm() {
+
+
+    const router=useRouter();
     const { user, isAuthenticated, isLoading } = useKindeAuth();
 
     const [allowedEmails, setAllowedEmails] = useState("")
@@ -58,7 +62,9 @@ export default function CreateDocForm() {
 
       if (!res.ok) throw new Error(await res.json()).error || "Failed";
       const result = await res.json();
+      console.log(result);
       alert("Doc Created !",result.id);
+      router.push(`/doc/${result.id}`);
       resetForm(e);
     } catch (error) {
       console.log(error);

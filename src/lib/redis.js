@@ -1,21 +1,24 @@
+// lib/redis.js
+import { createClient } from "redis";
 
-import { createClient } from 'redis';
+let redis;
 
-const redisClient = createClient({
-  url: process.env.REDIS_URL,
-});
+if (!global.redisClient) {
+  global.redisClient = createClient({
+    username: "default",
+    password: process.env.REDIS_PW,
+    socket: {
+      host: process.env.REDIS_HOST,
+      port: Number(process.env.REDIS_PORT),
+    },
+  });
 
-const getRedisClient = async () => {
-  try {
-    if (!redisClient.isOpen) {
-      await redisClient.connect();
-      console.log('Redis connected successfully');
-    }
-  } catch (error) {
-    console.error('Redis connection error:', error);
-    process.exit(1);
-  }
-};
+  global.redisClient.on("error", (err) => console.log("Redis Client Error", err));
 
-export { redisClient };
-export default getRedisClient;
+  // Connect once
+  global.redisClient.connect().catch(console.error);
+}
+
+redis = global.redisClient;
+
+export default redis;

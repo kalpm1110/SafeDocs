@@ -1,10 +1,7 @@
 
 import Link from "next/link";
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import AuthButtons from "./AuthButtons";
-export default async function Navbar() {
-    const {getUser}=getKindeServerSession();
-    const user=await getUser();
+export default  function Navbar({user}) {
     return (
         <nav className="flex justify-between items-center p-4 border-b">
             <Link href="/"  className="font-bold text-xl">SafeDocs</Link>

@@ -1,8 +1,9 @@
 
 import { Geist, Geist_Mono } from "next/font/google";
 import "../styles/globals.css"
-import Navbar from "@/components/Navbar";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { Providers } from "./providers";
+import NavbarController from "@/components/NavBarController";
 
 
 
@@ -22,17 +23,16 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
-
-
+  const { getUser } = getKindeServerSession();
+  const user =await getUser();
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Navbar></Navbar>
         <Providers>
-
+          <NavbarController user={user}></NavbarController>
           {children}
+          <footer>Footer</footer>
         </Providers>
-        <footer>Footer</footer>
       </body>
     </html>
   );
