@@ -4,11 +4,17 @@ import { useState } from "react"
 import { Label } from "../ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
 
 
 function JoinDocForm() {
+  const router=useRouter();
   const [doclink, setdoclink] = useState("")
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(e.target.doclink.value);
+    setdoclink(e.target.doclink.value);
+    router.push(e.target.doclink.value);
 
   }
   return (

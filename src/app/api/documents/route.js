@@ -1,24 +1,13 @@
 
 
+import { encrpytText } from "@/lib/crypto";
 import redis from "@/lib/redis";
 import { supabaseServer } from "@/lib/supabase";
-import { createCipheriv, randomBytes } from "crypto";
-
-
-const ENCRYPTION_KEY = Buffer.from(process.env.ENCRYPTION_KEY, 'base64');
-function encrpyt(data) {
-    const iv = randomBytes(12);
-    const cipher = createCipheriv('aes-256-gcm', ENCRYPTION_KEY, iv);
-    let encrpted = cipher.update(data, 'utf8', 'base64');
-    encrpted += cipher.final('base64');
-    const authTag = cipher.getAuthTag();
-    return Buffer.concat([iv, Buffer.from(encrpted, 'base64'), authTag]).toString('base64');
-}
 
 export async function POST(request) {
     try {
         const docData = await request.json();
-        const encrpteddata = encrpyt(docData.concat || '');
+        const encrpteddata =encrpytText(docData.content);
 
         const { data, error } = await supabaseServer.from('documents').insert({
             ownerId: docData.ownerId,
